@@ -1,19 +1,20 @@
-with import ./nix/pkgs.nix {};
-let merged-openssl = symlinkJoin { name = "merged-openssl"; paths = [ openssl.out openssl.dev ]; };
-in stdenv.mkDerivation rec {
-  name = "tony_montona";
-  env = buildEnv { name = name; paths = buildInputs; };
+{ pkgs ? import <nixpkgs> {} }:
 
+pkgs.mkShell {
   buildInputs = [
-    rustup
-    openssl
-    libclang
-    cmake
-    wasm-pack
-    wasm-bindgen-cli
+    pkgs.rustup
+    pkgs.pkg-config
+    pkgs.openssl
+    pkgs.cmake
+    pkgs.libsodium
+    pkgs.secp256k1
+    pkgs.lz4
+    pkgs.zlib
   ];
+
   shellHook = ''
-    export OPENSSL_DIR="${merged-openssl}"
+    rustup toolchain install stable
     rustup default stable
+    rustup component add rustfmt
   '';
 }
